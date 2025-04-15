@@ -1,0 +1,238 @@
+# .github/workflows/setup-new-repo.yml
+name: Setup New Repository
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo_name:
+        description: 'Name of the new repository to create'
+        required: true
+      subproject_name:
+        description: 'Optional subproject/working group name (leave empty for independent sandbox repo)'
+        required: false
+      repo_wiki_page:
+        description: 'URL of the repository wiki page'
+        required: true
+      subproject_wiki_page:
+        description: 'Optional URL of the subproject wiki page'
+        required: false
+      mailinglist_name:
+        description: 'Mailing list name'
+        required: true
+      initial_codeowners:
+        description: 'Space-separated GitHub usernames (with @) for initial CODEOWNERS'
+        required: true
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    environment: repo-setup
+    permissions:
+      issues: write
+      contents: write
+      actions: write
+      pull-requests: write
+
+    steps:
+
+      - name: Checkout template repository
+        uses: actions/checkout@v4
+
+      - name: Set up GitHub CLI token with personal access token
+        run: |
+          echo "GH_TOKEN=${{ secrets.GH_REPO_CREATE_TOKEN }}" >> $GITHUB_ENV
+          echo "Token GH_REPO_CREATE_TOKEN ready for use in GitHub CLI"
+
+      - name: Create new repository and set variables
+        run: |
+          REPO_NAME=${{ github.event.inputs.repo_name }}
+          OWNER=$(echo '${{ github.repository }}' | cut -d'/' -f1)
+
+          echo "Checking if repository $OWNER/$REPO_NAME already exists..."
+          if gh api repos/$OWNER/$REPO_NAME > /dev/null 2>&1; then
+            echo "::error::Repository $OWNER/$REPO_NAME already exists. Exiting."
+            exit 1
+          fi
+
+          echo "Creating new repository: https://github.com/$OWNER/$REPO_NAME"
+          gh repo create "$OWNER/$REPO_NAME" --public --template "$OWNER/$(basename '${{ github.repository }}')" --confirm
+
+          echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
+          echo "OWNER=$OWNER" >> $GITHUB_ENV
+          echo "MAINTAINERS_TEAM=${REPO_NAME}_maintainers" >> $GITHUB_ENV
+          echo "CODEOWNERS_TEAM=${REPO_NAME}_codeowners" >> $GITHUB_ENV
+          echo "CODEOWNERS_LIST=${{ github.event.inputs.initial_codeowners }}" >> $GITHUB_ENV
+
+      - name: Create teams
+        run: |
+          if gh api orgs/$OWNER/teams > /dev/null 2>&1; then
+            if ! gh api orgs/$OWNER/teams/$MAINTAINERS_TEAM > /dev/null 2>&1; then
+              MAINTAINERS_PARENT_ID=$(gh api orgs/$OWNER/teams/maintainers | jq -r '.id')
+              MAINTAINERS_PARENT_ID_NUM=$(echo "$MAINTAINERS_PARENT_ID" | grep -o '[0-9]*')
+              echo "Debug: MAINTAINERS_PARENT_ID_NUM=$MAINTAINERS_PARENT_ID_NUM"
+              if [ -z "$MAINTAINERS_PARENT_ID_NUM" ]; then
+                echo "::error::Invalid team ID format for maintainers. Expected numeric ID."
+                exit 1
+              fi
+              echo "{\"name\": \"$MAINTAINERS_TEAM\", \"description\": \"Maintainers for $REPO_NAME repository\", \"parent_team_id\": $MAINTAINERS_PARENT_ID_NUM}" > maintainer_payload.json
+              gh api orgs/$OWNER/teams \
+                -X POST \
+                -H "Accept: application/vnd.github+json" \
+                --input maintainer_payload.json
+            else
+              echo "Team $MAINTAINERS_TEAM already exists. Skipping creation."
+            fi
+
+            if ! gh api orgs/$OWNER/teams/$CODEOWNERS_TEAM > /dev/null 2>&1; then
+              CODEOWNERS_PARENT_ID=$(gh api orgs/$OWNER/teams/codeowners | jq -r '.id')
+              CODEOWNERS_PARENT_ID_NUM=$(echo "$CODEOWNERS_PARENT_ID" | grep -o '[0-9]*')
+              echo "Debug: CODEOWNERS_PARENT_ID_NUM=$CODEOWNERS_PARENT_ID_NUM"
+              if [ -z "$CODEOWNERS_PARENT_ID_NUM" ]; then
+                echo "::error::Invalid team ID format for codeowners. Expected numeric ID."
+                exit 1
+              fi
+              echo "{\"name\": \"$CODEOWNERS_TEAM\", \"description\": \"Codeowners for $REPO_NAME repository\", \"parent_team_id\": $CODEOWNERS_PARENT_ID_NUM}" > codeowners_payload.json
+              gh api orgs/$OWNER/teams \
+                -X POST \
+                -H "Accept: application/vnd.github+json" \
+                --input codeowners_payload.json
+            else
+              echo "Team $CODEOWNERS_TEAM already exists. Skipping creation."
+            fi
+
+            CODEOWNERS_LIST=$(echo "$CODEOWNERS_LIST" | xargs)
+            for username in $CODEOWNERS_LIST; do
+              clean_user=$(echo "$username" | sed 's/^@//')
+              echo "Checking if @$clean_user is a valid GitHub user..."
+              if gh api users/$clean_user > /dev/null 2>&1; then
+                echo "Inviting @$clean_user to team $CODEOWNERS_TEAM"
+                gh api orgs/$OWNER/teams/$CODEOWNERS_TEAM/memberships/$clean_user -X PUT -f role=member || echo "Failed to invite $clean_user"
+              else
+                echo "::warning::User @$clean_user does not exist or cannot be looked up. Skipping."
+              fi
+            done
+          else
+            echo "Skipping team creation — not running in an organization."
+          fi
+
+      - name: Configure repository settings
+        run: |
+          gh repo edit $OWNER/$REPO_NAME \
+            --description "$REPO_NAME" \
+            --homepage "${{ github.event.inputs.repo_wiki_page }}" \
+            --add-topic sandbox-api-repository
+          gh api -X PATCH repos/$OWNER/$REPO_NAME \
+            -F has_discussions=true \
+            -F has_issues=true \
+            -F has_wiki=false
+
+      - name: Update README.md placeholders
+        run: |
+          # changes the README.md from template repository and updates the README.md in the new repository with it 
+          sed -i "s/{{repo_name}}/$REPO_NAME/g" README.md
+          sed -i "s|{{repo_wiki_page}}|${{ github.event.inputs.repo_wiki_page }}|g" README.md
+          sed -i "s|{{subproject_name}}|${{ github.event.inputs.subproject_name }}|g" README.md
+          sed -i "s|{{subproject_wiki_page}}|${{ github.event.inputs.subproject_wiki_page }}|g" README.md
+          sed -i "s|{{mailinglist_name}}|${{ github.event.inputs.mailinglist_name }}|g" README.md
+          sed -i "s|{{initial_codeowners}}|${{ github.event.inputs.initial_codeowners }}|g" README.md
+
+          SHA=""
+          for i in {1..5}; do
+            SHA=$(gh api repos/$OWNER/$REPO_NAME/contents/README.md 2>/dev/null | jq -r '.sha')
+            if [ "$SHA" != "null" ] && [ -n "$SHA" ]; then
+              echo "Found README.md sha: $SHA"
+              break
+            else
+              echo "README.md not yet available, retrying in 2s..."
+              sleep 2
+            fi
+          done
+
+          gh api repos/$OWNER/$REPO_NAME/contents/README.md \
+            -X PUT \
+            -F message='Update README.md with project metadata' \
+            -F content="$(base64 -w 0 README.md)" \
+            -F sha="$SHA"
+
+      - name: Set team permissions
+        run: |
+          if gh api orgs/$OWNER/teams > /dev/null 2>&1; then
+            if gh api orgs/$OWNER/teams/$MAINTAINERS_TEAM > /dev/null 2>&1; then
+              gh api orgs/$OWNER/teams/$MAINTAINERS_TEAM/repos/$OWNER/$REPO_NAME \
+                -X PUT -H "Accept: application/vnd.github+json" -f permission=triage || \
+                echo "::error::Failed to set permissions for $MAINTAINERS_TEAM. Please check team and repository availability."
+            else
+              echo "::error::Team $MAINTAINERS_TEAM does not exist. Cannot assign permissions."
+              exit 1
+            fi
+            
+            if gh api orgs/$OWNER/teams/$CODEOWNERS_TEAM > /dev/null 2>&1; then
+                echo "Assigning permissions to CODEOWNERS_TEAM: [$CODEOWNERS_TEAM]"
+                gh api orgs/$OWNER/teams/$CODEOWNERS_TEAM/repos/$OWNER/$REPO_NAME \
+                  -X PUT -H "Accept: application/vnd.github+json" -f permission=push || \
+                  echo "::error::Failed to set permissions for $CODEOWNERS_TEAM. Please check team and repository availability."
+            else
+              echo "::error::Team $CODEOWNERS_TEAM does not exist. Cannot assign permissions."
+              exit 1
+            fi
+            
+            gh api orgs/$OWNER/teams/admins/repos/$OWNER/$REPO_NAME \
+              -X PUT -H "Accept: application/vnd.github+json" -f permission=maintain || \
+              echo "::error::Failed to set permissions for admin team. Please check team and repository availability."
+          else
+            echo "Skipping team permission assignment — not running in an organization."
+          fi
+
+      - name: Update CODEOWNERS file
+        run: |
+          sed "s|{{initial_codeowners}}|$CODEOWNERS_LIST|g" templates/CODEOWNERS > CODEOWNERS
+          CODEOWNERS_SHA=$(gh api repos/$OWNER/$REPO_NAME/contents/CODEOWNERS | jq -r '.sha')
+
+          gh api repos/$OWNER/$REPO_NAME/contents/CODEOWNERS \
+            -X PUT \
+            -F message='Update CODEOWNERS from template' \
+            -F content="$(base64 -w 0 CODEOWNERS)" \
+            -F sha="$CODEOWNERS_SHA"
+
+
+      - name: Sync rulesets from template repository
+        run: |
+          TEMPLATE_REPO=$(basename "${{ github.repository }}")
+          echo "Fetching rulesets from $OWNER/$TEMPLATE_REPO"
+
+          RULESETS=$(gh api repos/$OWNER/$TEMPLATE_REPO/rulesets \
+            -H "Accept: application/vnd.github+json" 2>/dev/null || echo "[]")
+
+          if ! echo "$RULESETS" | jq -e 'type == "array" and length > 0' > /dev/null; then
+            echo "No valid rulesets array found in template repository. Skipping."
+            exit 0
+          fi
+
+          echo "$RULESETS" | jq -r '.[].id' | while read -r ruleset_id; do
+            RULESET=$(gh api repos/$OWNER/$TEMPLATE_REPO/rulesets/$ruleset_id \
+              -H "Accept: application/vnd.github+json")
+            NAME=$(echo "$RULESET" | jq -r '.name')
+            echo "Syncing full ruleset: $NAME"
+
+            PAYLOAD=$(echo "$RULESET" | jq 'del(.id, .repository_id, .creator, .created_at, .updated_at)')
+            echo "$PAYLOAD" > ruleset.json
+
+            gh api repos/$OWNER/$REPO_NAME/rulesets \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              --input ruleset.json || echo "Warning: Failed to apply ruleset $NAME"
+          done
+
+      - name: Create initial issues
+        run: |
+          ADMIN_ISSUE_URL=$(gh issue create --repo $OWNER/$REPO_NAME \
+            --title "New Repository - Initial administrative tasks" \
+            --body "$(cat templates/issues/initial-admin.md)")
+
+          gh issue create --repo $OWNER/$REPO_NAME \
+            --title "New Repository - Initial tasks for codeowners" \
+            --body "$(cat templates/issues/initial-codeowners.md)"
+
+          gh issue comment "$ADMIN_ISSUE_URL" \
+            --body "✅ Repository setup has been completed by automation. You may now proceed with the checklist."
+
