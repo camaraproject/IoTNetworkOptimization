@@ -17,9 +17,9 @@ Sandbox API Repository to describe, develop, document, and test the IoTNetworkOp
 
 * Service API(s) “IoTNetworkOptimization” (see APIBacklog.md) 
 * The API(s) provide(s) the API consumer with the ability to:  
-  * §Short API scope description§ !! Add here a scope description according to the API proposal
+  * activate network features for that specific fleet of IoT devices, e.g., energy saving features.
 * Describe, develop, document, and test the API(s)
-* Started: §start date§
+* Started: April 2025
 <!-- * Incubating stage since: {{incubation date}} --> 
 
 ## Release Information
