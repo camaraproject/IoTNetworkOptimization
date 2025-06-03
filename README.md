@@ -11,6 +11,7 @@
 
 Sandbox API Repository to describe, develop, document, and test the IoTNetworkOptimization Service API(s). The repository does not yet belong to a CAMARA Sub Project.
 
+* API Repository wiki page: https://lf-camaraproject.atlassian.net/wiki/x/AYCzBw
 
 ## Scope
 
