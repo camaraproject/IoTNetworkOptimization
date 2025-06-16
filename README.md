@@ -11,7 +11,7 @@
 
 Sandbox API Repository to describe, develop, document, and test the IoTNetworkOptimization Service API(s). The repository does not yet belong to a CAMARA Sub Project.
 
-* API Repository [wiki page](https://lf-camaraproject.atlassian.net/) !! not yet created, update with final link
+* API Repository [wiki page](https://lf-camaraproject.atlassian.net/wiki/x/AYCzBw) 
 
 ## Scope
 
@@ -37,7 +37,7 @@ The repository has no (pre)releases yet, work in progress is within the main bra
 
   * Schedule: !! tbd
   * [Registration / Join](https://zoom-lfx.platform.linuxfoundation.org/meetings/telcoapi) !! Update this link with your meeting registration/join link and delete the task
-  * Minutes: Access [meeting minutes](https://lf-camaraproject.atlassian.net/) !! update this link to your minutes archive page using the "Share" link and delete the task
+  * Minutes: Access [meeting minutes](https://lf-camaraproject.atlassian.net/wiki/x/T4CzBw)
 * Mailing List
-  * Subscribe / Unsubscribe to the mailing list <https://lists.camaraproject.org/g/sp-IoT-Network-Optimization>.
-  * A message to the community of this Sub Project can be sent using <sp-IoT-Network-Optimization@lists.camaraproject.org>.
+  * Subscribe / Unsubscribe to the mailing list <https://lists.camaraproject.org/g/sp-iot-network-optimization>.
+  * A message to the community of this Sub Project can be sent using <sp-iot-network-optimization@lists.camaraproject.org>.
