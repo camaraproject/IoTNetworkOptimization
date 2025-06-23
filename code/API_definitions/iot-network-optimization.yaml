@@ -416,7 +416,7 @@ components:
           description: Event details payload described in each CAMARA API and
             referenced by its type
         time:
-          $ref: "#/components/schemas/DateTime" 
+          $ref: "#/components/schemas/DateTime"
 
     CloudEventPowerSaving:
       description: provides back the power saving operation result.
