@@ -66,7 +66,7 @@ info:
     principles of transparency and user-centric privacy-by-design.
     ## API Documentation
     ## Details
-    The IoT Network Optimization API provides the API Consumer with the 
+    The IoT Network Optimization API provides the API Consumer with the
     capability to activate and manage IoT-specific network features for a fleet
     of connected devices. The API enables optimized power consumption
     transmission by leveraging network-level configurations tailored for IoT
@@ -82,7 +82,7 @@ info:
     By using the IoT Network Optimization API, Service Providers can ensure
     their IoT deployments operate at peak efficiency extending device battery
     life and improving overall service reliability.
-    
+
     The IoT Network Optimization API is an intent based API.
     \
     The IoT Network Optimization API supports the following Intent:
@@ -198,7 +198,7 @@ paths:
       operationId: getPowerSaving
       security:
         - oAuth2:
-          - 'iot-management:power-saving:read'
+            - 'iot-management:power-saving:read'
       responses:
         "200":
           description: Power-saving features activated successfully
@@ -416,7 +416,7 @@ components:
           description: Event details payload described in each CAMARA API and
             referenced by its type
         time:
-          $ref: "#/components/schemas/DateTime"    
+          $ref: "#/components/schemas/DateTime" 
 
     CloudEventPowerSaving:
       description: provides back the power saving operation result.
@@ -635,13 +635,13 @@ components:
                       - UNAUTHENTICATED
           examples:
             GENERIC_401_UNAUTHENTICATED:
-              description: | 
-                Request cannot be authenticated and a new authentication is 
+              description: |
+                Request cannot be authenticated and a new authentication is
                 required
               value:
                 status: 401
                 code: UNAUTHENTICATED
-                message: | 
+                message: |
                   Request not authenticated due to missing, invalid, or expired
                   credentials. A new authentication is required.
     Generic403:
