@@ -7,28 +7,28 @@ info:
   title: IoT Network Optimization API
   description: |
     ## Overview
-    The IoT Network Optimization API provides the API Consumer with the 
+    The IoT Network Optimization API provides the API Consumer with the
     capabilities of activating IoT-specific features for a fleet of devices.
     ## Introduction
-    The scenario a Service Provider that partners with a Telco Operator to 
-    deploy IoT devices (e.g., sensors, trackers) across the Telco’s nationwide 
+    The scenario a Service Provider that partners with a Telco Operator to
+    deploy IoT devices (e.g., sensors, trackers) across the Telco’s nationwide
     cellular network.
-    To ensure prolonged device battery life and operational efficiency, the 
-    Service Provider seeks to activate power-saving configurations for its IoT 
+    To ensure prolonged device battery life and operational efficiency, the
+    Service Provider seeks to activate power-saving configurations for its IoT
     fleet during periods of low activity or based on predefined thresholds.
-    The Service Provider’s management system invokes the IoT Network 
+    The Service Provider’s management system invokes the IoT Network
     Optimization API to dynamically adjust network connectivity parameters.
-    This includes optimizing data transmission intervals, reducing signal 
-    strength during idle phases, and scheduling sleep cycles for devices 
-    without disrupting critical service functionality. The API evaluates 
-    network conditions, device locations, and application requirements to apply 
-    energy-efficient settings while maintaining guaranteed quality-of-service 
-    levels. By leveraging the API, the Provider ensures IoT devices consume 
-    minimal power during operation, significantly extending battery lifetimes 
-    and reducing energy costs. The optimization accounts for both device-level 
-    energy savings and reduced overhead on the Telco’s network infrastructure 
+    This includes optimizing data transmission intervals, reducing signal
+    strength during idle phases, and scheduling sleep cycles for devices
+    without disrupting critical service functionality. The API evaluates
+    network conditions, device locations, and application requirements to apply
+    energy-efficient settings while maintaining guaranteed quality-of-service
+    levels. By leveraging the API, the Provider ensures IoT devices consume
+    minimal power during operation, significantly extending battery lifetimes
+    and reducing energy costs. The optimization accounts for both device-level
+    energy savings and reduced overhead on the Telco’s network infrastructure
     (e.g., lower RAN utilization during sleep cycles). Clients benefit from
-    uninterrupted service with no manual 
+    uninterrupted service with no manual
     intervention, aligning sustainability goals with operational reliability.\
     \
     **Example use case and flow:**\
@@ -40,13 +40,12 @@ info:
     **The main elements of the IoT Network Optimization API are:**\
     \
     **PowerSavingRequest:**
-    Provides to the API Producer the intention of a enabling or disabling power 
+    Provides to the API Producer the intention of a enabling or disabling power
     saving features for a specific set of IoT devices.\
     \
     **PowerSavingResponse:**
-    Provides to the API Consumer the status of the power-saving feature 
+    Provides to the API Consumer the status of the power-saving feature
     activation based on the related transaction.\
-    
     # Authorization and authentication
     The "Camara Security and Interoperability Profile" provides details on how
     an API consumer requests an access token. Please refer to Identify and
@@ -68,40 +67,40 @@ info:
     ## API Documentation
     ## Details
     The IoT Network Optimization API provides the API Consumer with the 
-    capability to activate and manage IoT-specific network features for a fleet 
-    of connected devices. The API enables optimized power consumption 
+    capability to activate and manage IoT-specific network features for a fleet
+    of connected devices. The API enables optimized power consumption
     transmission by leveraging network-level configurations tailored for IoT
     deployments.
-    
-    The IoT API allows an IoT Service Provider to dynamically adjust network 
+
+    The IoT API allows an IoT Service Provider to dynamically adjust network
     parameters to optimize device performance and reduce operational overhead.
     The IoT API Consumer (typically the IoT Service Provider or a third-party
-    management system) invokes the API with identifiers for the target IoT 
-    devices. The API then applies the requested optimizations, such as enabling 
+    management system) invokes the API with identifiers for the target IoT
+    devices. The API then applies the requested optimizations, such as enabling
     low-power modes for battery-operated sensors.
-    
-    By using the IoT Network Optimization API, Service Providers can ensure 
-    their IoT deployments operate at peak efficiency extending device battery 
+
+    By using the IoT Network Optimization API, Service Providers can ensure
+    their IoT deployments operate at peak efficiency extending device battery
     life and improving overall service reliability.
     
     The IoT Network Optimization API is an intent based API.
     \
     The IoT Network Optimization API supports the following Intent:
-    - Intent1: I would like to activate power-saving features for my IoT devices 
-    during a specified period.
+    - Intent1: I would like to activate power-saving features for my IoT
+    devices during a specified period.
 
     The inputs for the above intent are:
     - IoT devices (e.g., device identifiers like IPs or SIM phone number)
     - power-saving desired status
     - time frame (e.g., start/end timestamps)
-    
+
     The output for the above intent are:
     - activation status (success/failure per device or group)
     - transaction ID for tracking
 
     The related endpoint is:
     - Intent: /features/power-saving
-    
+
     ## Additional CAMARA error responses
     The list of error codes in this API specification is not exhaustive.
     Therefore the API specification may not document some non-mandatory error
@@ -116,7 +115,7 @@ info:
     (FAQs will be added in a later version of the documentation)
     ## Release Notes
     First draft for the IoT Network Optimization API.
-  
+
   version: wip
   license:
     name: Apache 2.0
@@ -217,7 +216,7 @@ paths:
           $ref: "#/components/responses/Generic404"
         "501":
           $ref: "#/components/responses/Generic501"
-  
+
 ############################################################################
 #                                 Components                               #
 ############################################################################
@@ -418,7 +417,7 @@ components:
             referenced by its type
         time:
           $ref: "#/components/schemas/DateTime"    
-    
+
     CloudEventPowerSaving:
       description: provides back the power saving operation result.
       allOf:
@@ -426,7 +425,7 @@ components:
       properties:
         data:
           $ref: "#/components/schemas/PowerSavingResponse"
-          
+
     PowerSavingResponse:
       type: object
       properties:
@@ -445,7 +444,7 @@ components:
         status:
           type: string
           enum: [in-progress, success, failed]
-    
+
     Device:
       description: |
         End-user equipment able to connect to a mobile network. Examples of
@@ -551,7 +550,7 @@ components:
       type: string
       format: ipv6
       example: 2001:db8:85a3:8d3:1319:8a2e:370:7344
-    
+
     TransactionId:
       type: string
       format: uuid
@@ -636,13 +635,15 @@ components:
                       - UNAUTHENTICATED
           examples:
             GENERIC_401_UNAUTHENTICATED:
-              description: Request cannot be authenticated and a new 
-                authentication is required
+              description: | 
+                Request cannot be authenticated and a new authentication is 
+                required
               value:
                 status: 401
                 code: UNAUTHENTICATED
-                message: Request not authenticated due to missing, invalid, or 
-                  expired credentials. A new authentication is required.
+                message: | 
+                  Request not authenticated due to missing, invalid, or expired
+                  credentials. A new authentication is required.
     Generic403:
       description: Forbidden
       headers:
