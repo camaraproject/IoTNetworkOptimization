@@ -1,4 +1,4 @@
-
+@PowerSaving
 Feature: IoT Network Optimization API - Power Saving Features
   # Input to be provided by the implementation to the tester
   #
@@ -10,9 +10,10 @@ Feature: IoT Network Optimization API - Power Saving Features
   # * A device object on which power-saving mode must be activated
 
 
-  
+  ##########
   # Positive Scenario: Enable power-saving successfully
-
+  ##########
+  @IoT_PowerSaving_100_enable_success
   Scenario: Successfully enable power-saving features for a fleet of IoT devices
     Given an API consumer with valid OAuth2 access token and scope 'iot-management:power-saving:write'
     And a valid list of IoT devices with identifiers (e.g., phone number and IP address)
@@ -24,10 +25,10 @@ Feature: IoT Network Optimization API - Power Saving Features
     When the API completes processing and sends a callback to the notification sink
     Then the callback payload includes activationStatus for each device with status "success"
 
-  # ==============================================================
+  ###########
   # Negative Scenario: Invalid device identifier
-  # ==============================================================
-
+  ###########
+  @IoT_PowerSaving_101_invalid_device
   Scenario: Fail to enable power-saving when an invalid device identifier is provided
     Given an API consumer with valid OAuth2 token
     And an invalid list of device identifiers (e.g., malformed phone number)
@@ -35,30 +36,30 @@ Feature: IoT Network Optimization API - Power Saving Features
     Then the API responds with HTTP status 400
     And the error code is "INVALID_ARGUMENT"
 
-  # ==============================================================
+  ###########
   # Negative Scenario: Unauthorized request
-  # ==============================================================
-
+  ###########
+  @IoT_PowerSaving_102_no_auth
   Scenario: Fail to enable power-saving when no authentication token is provided
     Given an API consumer without an OAuth2 token
     When the API consumer sends a POST request to /features/power-saving
     Then the API responds with HTTP status 401
     And the error code is "UNAUTHENTICATED"
 
-  # ==============================================================
+  ###########
   # Negative Scenario: Forbidden due to insufficient permissions
-  # ==============================================================
-
+  ###########
+  @IoT_PowerSaving_103_forbidden_scope
   Scenario: Fail to enable power-saving when the token does not have write scope
     Given an API consumer with an OAuth2 token missing 'iot-management:power-saving:write' scope
     When the API consumer sends a POST request to /features/power-saving
     Then the API responds with HTTP status 403
     And the error code is "PERMISSION_DENIED"
 
-  # ==============================================================
+  ############
   # Scenario: Retrieve transaction status
-  # ==============================================================
-
+  ############
+  @IoT_PowerSaving_104_get_status_success
   Scenario: Successfully retrieve the power-saving transaction status
     Given an API consumer with valid OAuth2 token and scope 'iot-management:power-saving:read'
     And a valid transactionId received from a previous POST request
@@ -66,10 +67,10 @@ Feature: IoT Network Optimization API - Power Saving Features
     Then the API responds with HTTP status 200
     And the response includes activationStatus for each device
 
-  # ==============================================================
+  ############
   # Negative Scenario: Retrieve status with invalid transactionId
-  # ==============================================================
-
+  ############
+  @IoT_PowerSaving_105_get_status_invalid
   Scenario: Fail to retrieve status for an unknown transactionId
     Given an API consumer with valid OAuth2 token
     And an invalid or non-existent transactionId
@@ -77,10 +78,10 @@ Feature: IoT Network Optimization API - Power Saving Features
     Then the API responds with HTTP status 404
     And the error code is "NOT_FOUND"
 
-  # ==============================================================
+  ############
   # Scenario: Callback reception
-  # ==============================================================
-
+  ############
+  @IoT_PowerSaving_106_callback_received
   Scenario: Receive and validate callback on transaction completion
     Given the API consumer's notification sink endpoint is reachable and authorized
     And a power-saving transaction was initiated previously
@@ -89,4 +90,3 @@ Feature: IoT Network Optimization API - Power Saving Features
     And the event type is "org.camaraproject.iot.dta-status-changed-event"
     And the data field includes activationStatus for all devices
     And the data includes a valid transactionId
-
