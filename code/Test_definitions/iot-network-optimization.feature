@@ -1,5 +1,4 @@
 
-@PowerSaving
 Feature: IoT Network Optimization API - Power Saving Features
 
   # ==============================================================
