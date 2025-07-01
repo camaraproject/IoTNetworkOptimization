@@ -1,4 +1,4 @@
-Feature: CAMARA IoT Network Optimization API - Operation power-saving
+Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
 # Input to be provided by the implementation to the tester
 #
 # Implementation indications:
