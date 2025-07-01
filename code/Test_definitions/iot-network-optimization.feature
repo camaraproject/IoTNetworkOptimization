@@ -19,10 +19,18 @@
 #* ---license-end
 #*/
 Feature: IoT Network Optimization API - Power Saving Features
+  # Input to be provided by the implementation to the tester
+  #
+  # Implementation indications:
+  # - The implementation team must provide:
+  #   * List of device objects with valid identifiers (e.g., phone number, IP)
+  #   * Notification sink endpoint and credentials for callback reception
+  # Testing assets:
+  # * A device object on which power-saving mode must be activated
 
-  # ==============================================================
+
+  
   # Positive Scenario: Enable power-saving successfully
-  # ==============================================================
 
   Scenario: Successfully enable power-saving features for a fleet of IoT devices
     Given an API consumer with valid OAuth2 access token and scope 'iot-management:power-saving:write'
