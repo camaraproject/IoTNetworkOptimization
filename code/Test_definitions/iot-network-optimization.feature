@@ -8,7 +8,12 @@ Feature: IoT Network Optimization API - Power Saving Features
   #   * Notification sink endpoint and credentials for callback reception
   # Testing assets:
   # * A device object on which power-saving mode must be activated
-
+  #
+  Background: Common iot-network-optimization setup
+    Given the path "/iot-network-opt/vwip"
+    And the header "Content-Type" is set to "application/json"
+    And the header "x-correlator" is set to a UUID value
+    And the request body is set by default to a request body compliant with the schema
 
   ##########
   # Positive Scenario: Enable power-saving successfully
