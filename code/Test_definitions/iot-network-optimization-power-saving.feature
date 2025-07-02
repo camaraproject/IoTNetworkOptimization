@@ -100,7 +100,7 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
   # This scenario shows how request with invalid device identifier will be handled
   @power_saving_feature_05_invalid_device
   Scenario: Fail to enable power-saving when an invalid device identifier is provided
-    Given the request body property "$.devices" carries none valid device which is compliant with the OAS schema at "/components/schemas/Device"
+    Given the request body property "$.devices" carries an invalid device that is not compliant with the OAS schema at "/components/schemas/Device"
     And "$.enabled" is set to true
     And "$.notificationSink" is set to a proper value
     When the HTTP "POST" request is sent
