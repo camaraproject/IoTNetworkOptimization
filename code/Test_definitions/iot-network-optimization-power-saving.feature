@@ -119,7 +119,7 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     And the error code is "UNAUTHENTICATED"
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/responses/Generic401"
+    And the response body complies with the OAS schema at "/components/schemas/ErrorInfo"
 
 # This scenario show how request with an OAuth2 token missing 'iot-management:power-saving:write' scope is handled
   @power_saving_feature_07_forbidden_scope
@@ -130,7 +130,7 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     And the error code is "PERMISSION_DENIED"
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/responses/Generic403"
+    And the response body complies with the OAS schema at "/components/schemas/ErrorInfo"
 
 # Negative Scenario: Retrieve status with invalid transactionId
   @power_saving_feature_08_get_status_invalid
@@ -142,7 +142,7 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     And the error code is "NOT_FOUND"
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/responses/Generic404"
+    And the response body complies with the OAS schema at "/components/schemas/ErrorInfo"
 
   # Scenario: Callback reception
   @power_saving_feature_09_callback_received
