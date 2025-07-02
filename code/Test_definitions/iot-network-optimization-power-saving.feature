@@ -69,7 +69,8 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     And "$.notificationSink" is set to a proper value
     And "$.timePeriod" is set to a proper value
     When the HTTP "POST" request is sent
-    Then the power saving settings will be activated for all the devices specified and according to the parameters specified (e.g., just in the selected time period)
+    Then the power saving settings will be activated for all the devices specified
+    And the activation will follow the parameters specified (e.g., only during the selected time period)
     And the response status code is 200
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
