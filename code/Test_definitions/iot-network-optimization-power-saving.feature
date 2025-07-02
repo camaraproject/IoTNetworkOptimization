@@ -113,7 +113,7 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
   @power_saving_feature_06_no_auth
   Scenario: Fail to enable power-saving when no authentication token is provided
     Given an API consumer without an OAuth2 token
-    When When the HTTP "POST" request is sent
+    When the HTTP "POST" request is sent
     Then the API responds with HTTP status 401
     And the error code is "UNAUTHENTICATED"
     And the response header "Content-Type" is "application/json"
@@ -124,7 +124,7 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
   @power_saving_feature_07_forbidden_scope
   Scenario: Fail to enable power-saving when the token does not have write scope
     Given an API consumer with an OAuth2 token missing 'iot-management:power-saving:write' scope
-    When When the HTTP "POST" request is sent
+    When the HTTP "POST" request is sent
     Then the API responds with HTTP status 403
     And the error code is "PERMISSION_DENIED"
     And the response header "Content-Type" is "application/json"
