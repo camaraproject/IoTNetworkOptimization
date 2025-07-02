@@ -28,7 +28,7 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has same value as the request header "x-correlator"
     # The response has to comply with the generic response schema which is part of the spec
-    And the response body complies with the OAS schema at "/components/schemas/PowerSavingRequest"
+    And the response body complies with the OAS schema at "/components/schemas/PowerSavingResponse"
     And "$.transactionId" is set to a proper value
     # The received callback must be compliant and should carry the aspected values
     And within a limited period of time I should receive a callback at "/components/schemas/NotificationSink/sink"
