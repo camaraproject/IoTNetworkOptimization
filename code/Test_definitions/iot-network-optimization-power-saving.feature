@@ -103,7 +103,7 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     And "$.enabled" is set to true
     And "$.notificationSink" is set to a proper value
     When the HTTP "POST" request is sent
-    Then Then the power saving settings will not be activated for any of the devices specified
+    Then the power saving settings will not be activated for any of the devices specified
     And the response HTTP status code is 400
     And the error code is "INVALID_ARGUMENT"
     And the response header "Content-Type" is "application/json"
