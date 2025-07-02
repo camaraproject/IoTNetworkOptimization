@@ -108,16 +108,6 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     And the error code is "INVALID_ARGUMENT"
     And the response header "Content-Type" is "application/json"
 
-  # Negative Scenario: Retrieve status with invalid transactionId
-  @power_saving_feature_get_status_invalid
-  Scenario: Fail to retrieve status for an unknown transactionId
-    Given an API consumer with valid OAuth2 token
-    And an invalid or non-existent transactionId
-    When the API consumer sends a GET request to /features/power-saving/transactions/{transactionId}
-    Then the API responds with HTTP status 404
-    And the error code is "NOT_FOUND"
-    And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/responses/Generic400"
     
 # This scenario show how request with no authentication token will be handled
   @power_saving_feature_06_no_auth
@@ -142,7 +132,7 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     And the response body complies with the OAS schema at "/components/responses/Generic403"
 
 # Negative Scenario: Retrieve status with invalid transactionId
-  @power_saving_08_get_status_invalid
+  @power_saving_feature_08_get_status_invalid
   Scenario: Fail to retrieve status for an unknown transactionId
     Given an API consumer with valid OAuth2 token
     And an invalid or non-existent transactionId
@@ -154,7 +144,7 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     And the response body complies with the OAS schema at "/components/responses/Generic404"
 
   # Scenario: Callback reception
-  @power_saving_09_callback_received
+  @power_saving_feature_09_callback_received
   Scenario: Receive and validate callback on transaction completion
     Given the API consumer's notification sink endpoint is reachable and authorized
     And a power-saving transaction was initiated previously
