@@ -25,13 +25,13 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     When the HTTP "POST" request is sent
     Then the power saving settings will be activated for all the devices specified
     And the response status code is 200
-    And the response header "Content-Type" is "application/json"
-    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json" and "x-correlator" has same value as the request header "x-correlator"
     # The response has to comply with the generic response schema which is part of the spec
     And the response body complies with the OAS schema at "/components/schemas/PowerSavingResponse"
     And "$.transactionId" is set to a proper value
     # The received callback must be compliant and should carry the aspected values
-    And I should receive a callback at "/components/schemas/NotificationSink/sink" with the body compliant with "/components/callbacks/onTransactionCompleted" with "x-correlator" with the same value as the request header "x-correlator"
+    And I receive a callback at "/components/schemas/NotificationSink/sink" with the body compliant to "/components/callbacks/onTransactionCompleted"
+    And "x-correlator" as the same value as the request header "x-correlator"
     And the callback carries the information defined in "/components/schemas/CloudEventPowerSaving"
     And "/components/schemas/CloudEventPowerSaving" in the callback should contain the parameter "$.transactionId" with the same value as in the 200 response of "/features/power-saving"
     And "/components/schemas/CloudEventPowerSaving" in the callback should contain the parameter "$.activationStatus" set to the expected value
@@ -46,12 +46,12 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     When the HTTP "POST" request is sent
     Then the power saving settings will be activated for all the devices specified
     And the response status code is 200
-    And the response header "Content-Type" is "application/json"
-    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json" and "x-correlator" has same value as the request header "x-correlator"
     # The response has to comply with the generic response schema which is part of the spec
     And the response body complies with the OAS schema at "/components/schemas/PowerSavingResponse" and "$.transactionId" is set to a proper value
     # The received callback must be compliant and should carry the aspected values
-    And I should receive a callback at "/components/schemas/NotificationSink/sink" with the body compliant with "/components/callbacks/onTransactionCompleted" with "x-correlator" with the same value as the request header "x-correlator"
+    And I should receive a callback at "/components/schemas/NotificationSink/sink" with the body compliant with "/components/callbacks/onTransactionCompleted"
+    And "x-correlator" as the same value as the request header "x-correlator"
     And the callback carries the information defined in "/components/schemas/CloudEventPowerSaving"
     And "/components/schemas/CloudEventPowerSaving" in the callback should contain the parameter "$.transactionId" with the same value as in the 200 response of "/features/power-saving"
     And "/components/schemas/CloudEventPowerSaving" in the callback should contain the parameter"$.activationStatus"
@@ -67,12 +67,12 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     Then the power saving settings will be activated for all the devices specified
     And the activation will follow the parameters specified (e.g., only during the selected time period)
     And the response status code is 200
-    And the response header "Content-Type" is "application/json"
-    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json" and "x-correlator" has same value as the request header "x-correlator"
     # The response has to comply with the generic response schema which is part of the spec
     And the response body complies with the OAS schema at "/components/schemas/PowerSavingResponse" with "$.transactionId" is set to a proper value
     # The received callback must be compliant and should carry the aspected values
-    And I should receive a callback at "/components/schemas/NotificationSink/sink" with the body compliant with "/components/callbacks/onTransactionCompleted" with "x-correlator" with the same value as the request header "x-correlator"
+    And I should receive a callback at "/components/schemas/NotificationSink/sink" with the body compliant with "/components/callbacks/onTransactionCompleted"
+    And "x-correlator" as the same value as the request header "x-correlator"
     And the callback carries the information defined in "/components/schemas/CloudEventPowerSaving"
     And "/components/schemas/CloudEventPowerSaving" in the callback should contain the parameter "$.transactionId" with the same value as in the 200 response of "/features/power-saving"
     And "/components/schemas/CloudEventPowerSaving" in the callback should contain the parameter"$.activationStatus"
