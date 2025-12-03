@@ -26,7 +26,7 @@ Sandbox API Repository to describe, develop, document, and test the IoTNetworkOp
 
 * Note: Please be aware that the project will have frequent updates to the main branch. There are no compatibility guarantees associated with code in any branch, including main, until a new release is created. For example, changes may be reverted before a release is created. **For best results, use the latest available release**.
 
-* `NEW`: The latest public release is [r1.0](https://github.com/camaraproject/IoTNetworkOptimization/releases/tag/r1.1) with iot-network-optimization v0.1.0 is available.
+* `NEW`: The latest pre-release is [r1.0](https://github.com/camaraproject/IoTNetworkOptimization/releases/tag/r1.1) with **iot-network-optimization v0.1.0 alpha** is available.
   * version v0.1.0 of the **API iot-network-optimization** - available [here](https://github.com/camaraproject/IoTNetworkOptimization/tree/r1.1)
     * API definitions **with inline documentation**:
       * OpenAPI [YAML](https://github.com/camaraproject/IoTNetworkOptimizationn/blob/r1.1/code/API_definitions/iot-network-optimization.yaml)
