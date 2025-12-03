@@ -24,14 +24,12 @@ Sandbox API Repository to describe, develop, document, and test the IoTNetworkOp
 
 ## Release Information
 
-* Note: Please be aware that the project will have frequent updates to the main branch. There are no compatibility guarantees associated with code in any branch, including main, until a new release is created. For example, changes may be reverted before a release is created. **For best results, use the latest available release**.
-
-* `NEW`: The latest public release is [r1.0](https://github.com/camaraproject/IoTNetworkOptimization/releases/tag/r1.1) with iot-network-optimization v0.1.0 is available.
-  * version v0.1.0 of the **API iot-network-optimization** - available [here](https://github.com/camaraproject/IoTNetworkOptimization/tree/r1.1)
-    * API definitions **with inline documentation**:
-      * OpenAPI [YAML](https://github.com/camaraproject/IoTNetworkOptimizationn/blob/r1.1/code/API_definitions/iot-network-optimization.yaml)
-      * [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/IoTNetworkOptimization/refs/tags/r1.1/code/API_definitions/iot-network-optimization.yaml&nocors) 
-      * [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/IoTNetworkOptimization/refs/tags/r1.1/code/API_definitions/iot-network-optimization.yaml)
+The repository has no (pre)releases yet, work in progress is within the main branch.
+<!-- Optional: an explicit listing of the latest (pre-)release with additional information, e.g. links to the API definitions -->
+<!-- In addition use/uncomment one or multiple the following alternative options when becoming applicable -->
+<!-- Pre-releases of this sub project are available in https://github.com/camaraproject/IoTNetworkOptimization/releases -->
+<!-- The latest public release is available here: https://github.com/camaraproject/IoTNetworkOptimization/releases/latest -->
+<!-- For changes see [CHANGELOG.md](https://github.com/camaraproject/IoTNetworkOptimization/blob/main/CHANGELOG.md) -->
 
 ## Contributing
 
