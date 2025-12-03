@@ -116,7 +116,7 @@ info:
     ## Release Notes
     First draft for the IoT Network Optimization API.
 
-  version: wip
+  version: 0.1.0
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
@@ -128,7 +128,7 @@ externalDocs:
 #                                     Servers                              #
 ############################################################################
 servers:
-  - url: "{apiRoot}/iot-network-opt/vwip"
+  - url: "{apiRoot}/iot-network-opt/v0.1"
     variables:
       apiRoot:
         default: http://localhost:9091
