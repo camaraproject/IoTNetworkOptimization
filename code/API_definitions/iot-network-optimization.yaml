@@ -132,7 +132,7 @@ servers:
     variables:
       apiRoot:
         default: http://localhost:9091
-        description: API root for the Energy Footprint Notification API
+        description: API root for the IoT Network Optimization API
 security:
   - notificationsBearerAuth: []
 tags:
@@ -182,7 +182,6 @@ paths:
       callbacks:
         onTransactionCompleted:
           $ref: "#/components/callbacks/onTransactionCompleted"
-
   /features/power-saving/transactions/{transactionId}:
     get:
       parameters:
@@ -256,81 +255,288 @@ components:
   callbacks:
     onTransactionCompleted:
       # when data is sent, it will be sent to the callback url provided
-      '{$request.body.notificationSink.sink}':
+      "{$request.body#/subscriptionRequest/sink}":
         post:
-          summary: Provides back the result of the analysis on the energy
-           consumption
-          description: once the system has calculated the energy consumption of
-           the service, this information is provided back to the API Consumer
-          operationId: energyConsumptionNotification
+          summary: Provides back the result of the enabling operations
+          description: |
+            once the system has request to enable power-settings for all
+            the devices it collects the results and provides it back to
+            the API Consumer
+          operationId: IoTNetworkOptimizationNotification
           parameters:
             - $ref: '#/components/parameters/x-correlator'
           security:
             - notificationsBearerAuth: []
           requestBody:
-            description: payload containing the calculated energy consumption
+            description: payload containing the operation results
+            required: true
             content:
-              application/json:
+              application/cloudevents+json:
                 schema:
-                  $ref: '#/components/schemas/CloudEventPowerSaving'
+                  allOf:
+                    - $ref: '#/components/schemas/CloudEvent'
+                  example:
+                    id: "string"
+                    source: "https://notificationSendServer12.example.com"
+                    type: "org.camaraproject.iot-network-optimization-notification.v1.power-saving"
+                    specversion: "1.0"
+                    datacontenttype: "application/json"
+                    data:
+                      activationStatus:
+                        - device:
+                            phoneNumber: "+123456789"
+                            networkAccessIdentifier: "123456789@domain.com"
+                            ipv4Address:
+                              publicAddress: "84.125.93.10"
+                              publicPort: 59765
+                            ipv6Address: "2001:db8:85a3:8d3:1319:8a2e:370:7344"
+                          status: "pending"
+                      transactionId: "string"
+                    time: "2018-04-05T17:31:00Z"
           responses:
-            '202':
+            "202":
               description: Your server implementation should return this HTTP
                 status code if the data was received successfully
               headers:
                 x-correlator:
                   $ref: '#/components/headers/x-correlator'
-            '204':
+            "204":
               description: Your server should return this HTTP status code if
                no longer interested in further updates
               headers:
                 x-correlator:
                   $ref: '#/components/headers/x-correlator'
+            "400":
+              $ref: "#/components/responses/Generic400"
+            "401":
+              $ref: "#/components/responses/Generic401"
+            "403":
+              $ref: "#/components/responses/Generic403"
+            "410":
+              $ref: "#/components/responses/Generic410"
+            "429":
+              $ref: "#/components/responses/Generic429"
   ############################################################################
   #                                 Resources                                #
   ############################################################################
   schemas:
-    NotificationSink:
-      description: ""
+    SubscriptionRequest:
+      description: The request for creating a event-type event subscription
       type: object
       required:
         - sink
+        - protocol
+        - config
+        - types
       properties:
+        protocol:
+          $ref: "#/components/schemas/Protocol"
         sink:
-          description: 'https callback address where the notification must be
-            POST-ed'
           type: string
-        sinkCredentials:
-          description: Sink credential provides authorization information
-            necessary to enable delivery of events to a target
-          type: object
+          format: uri
+          pattern: ^https:\/\/.+$
+          description: The address to which events shall be delivered using the selected protocol.
+          example: "https://endpoint.example.com/sink"
+        sinkCredential:
+          $ref: "#/components/schemas/SinkCredential"
+        types:
+          description: |
+            Camara Event types eligible to be delivered by this subscription.
+            Note: the maximum number of event types per subscription will be decided at API project level
+          type: array
+          minItems: 1
+          maxItems: 1
+          items:
+            $ref: "#/components/schemas/SubscriptionEventType"
+        config:
+          $ref: "#/components/schemas/Config"
+      discriminator:
+        propertyName: protocol
+        mapping:
+          HTTP: "#/components/schemas/HTTPSubscriptionRequest"
+    HTTPSubscriptionRequest:
+      allOf:
+        - $ref: "#/components/schemas/SubscriptionRequest"
+        - type: object
           properties:
-            credentialtype:
+            protocolSettings:
+              $ref: "#/components/schemas/HTTPSettings"
+    HTTPSettings:
+      type: object
+      properties:
+        headers:
+          type: object
+          description: |-
+            A set of key/value pairs that is copied into the HTTP request as custom headers.
+
+            NOTE: Use/Applicability of this concept has not been discussed in Commonalities under the scope of Meta Release v0.4. When required by an API project as an option to meet a UC/Requirement, please generate an issue for Commonalities discussion about it.
+          additionalProperties:
+            type: string
+        method:
+          type: string
+          description: The HTTP method to use for sending the message.
+          enum:
+            - POST
+
+    Protocol:
+      type: string
+      enum: ["HTTP", "MQTT3", "MQTT5", "AMQP", "NATS", "KAFKA"]
+      description: Identifier of a delivery protocol. Only HTTP is allowed for now
+      example: "HTTP"
+    Config:
+      description: |
+        Implementation-specific configuration parameters needed by the subscription manager for acquiring events.
+        In CAMARA we have predefined attributes like `subscriptionExpireTime`, `subscriptionMaxEvents`, `initialEvent`
+        Specific event type attributes must be defined in `subscriptionDetail`
+        Note: if a request is performed for several event type, all subscribed event will use same `config` parameters.
+      type: object
+      required:
+        - subscriptionDetail
+      properties:
+        subscriptionDetail:
+          $ref: "#/components/schemas/CreateSubscriptionDetail"
+        subscriptionExpireTime:
+          type: string
+          format: date-time
+          example: 2023-01-17T13:18:23.682Z
+          description: The subscription expiration time (in date-time format) requested by the API consumer. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone. Up to API project decision to keep it.
+        subscriptionMaxEvents:
+          type: integer
+          description: Identifies the maximum number of event reports to be generated (>=1) requested by the API consumer - Once this number is reached, the subscription ends. Up to API project decision to keep it.
+          minimum: 1
+          example: 5
+        initialEvent:
+          type: boolean
+          description: |
+            Set to `true` by API consumer if consumer wants to get an event as soon as the subscription is created and current situation reflects event request.
+            Example: Consumer request Roaming event. If consumer sets initialEvent to true and device is in roaming situation, an event is triggered
+            Up to API project decision to keep it.
+    SinkCredential:
+      description: A sink credential provides authentication or authorization information necessary to enable delivery of events to a target.
+      type: object
+      example:
+        credentialType: ACCESSTOKEN
+      properties:
+        credentialType:
+          type: string
+          enum:
+            - PLAIN
+            - ACCESSTOKEN
+            - REFRESHTOKEN
+          description: |
+            The type of the credential.
+            Note: Type of the credential - MUST be set to ACCESSTOKEN for now
+      discriminator:
+        propertyName: credentialType
+        mapping:
+          PLAIN: "#/components/schemas/PlainCredential"
+          ACCESSTOKEN: "#/components/schemas/AccessTokenCredential"
+          REFRESHTOKEN: "#/components/schemas/RefreshTokenCredential"
+      required:
+        - credentialType
+    PlainCredential:
+      type: object
+      description: A plain credential as a combination of an identifier and a secret.
+      allOf:
+        - $ref: "#/components/schemas/SinkCredential"
+        - type: object
+          required:
+            - identifier
+            - secret
+          properties:
+            identifier:
+              description: The identifier might be an account or username.
               type: string
-              description: Type of the credential - MUST be set to ACCESSTOKEN
-                for now
-              enum:
-                - "ACCESSTOKEN"
+            secret:
+              description: The secret might be a password or passphrase.
+              type: string
+    AccessTokenCredential:
+      type: object
+      description: An access token credential.
+      allOf:
+        - $ref: "#/components/schemas/SinkCredential"
+        - type: object
+          properties:
             accessToken:
+              description: REQUIRED. An access token is a previously acquired token granting access to the target resource.
               type: string
-              description: Access Token granting access to the POST operation to
-                create notification
-            accessTokenExpireUtc:
+            accessTokenExpiresUtc:
               type: string
               format: date-time
-              description: An absolute UTC instant at which the access token
-                shall be considered expired.
+              description: |
+                REQUIRED. An absolute (UTC) timestamp at which the token shall be considered expired.
+                In the case of an ACCESS_TOKEN_EXPIRED termination reason, implementation should notify the client before the expiration date.
+                If the access token is a JWT and registered "exp" (Expiration Time) claim is present, the two expiry times should match.
+                It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+              example: "2023-07-03T12:27:08.312Z"
             accessTokenType:
+              description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)).
               type: string
-              description: Type of access token - MUST be set to bearer for now
               enum:
-                - "bearer"
+                - bearer
+          required:
+            - accessToken
+            - accessTokenExpiresUtc
+            - accessTokenType
+    RefreshTokenCredential:
+      type: object
+      description: An access token credential with a refresh token.
+      allOf:
+        - $ref: "#/components/schemas/SinkCredential"
+        - type: object
+          properties:
+            accessToken:
+              description: REQUIRED. An access token is a previously acquired token granting access to the target resource.
+              type: string
+            accessTokenExpiresUtc:
+              type: string
+              format: date-time
+              description: |
+                REQUIRED. An absolute (UTC) timestamp at which the token shall be considered expired.
+                In the case of an ACCESS_TOKEN_EXPIRED termination reason, implementation should notify the client before the expiration date.
+                If the access token is a JWT and registered "exp" (Expiration Time) claim is present, the two expiry times should match.
+                It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+              example: "2023-07-03T12:27:08.312Z"
+            accessTokenType:
+              description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)).
+              type: string
+              enum:
+                - bearer
+            refreshToken:
+              description: REQUIRED. An refresh token credential used to acquire access tokens.
+              type: string
+            refreshTokenEndpoint:
+              type: string
+              format: uri
+              description: REQUIRED. A URL at which the refresh token can be traded for an access token.
+      required:
+        - accessToken
+        - accessTokenExpiresUtc
+        - accessTokenType
+        - refreshToken
+        - refreshTokenEndpoint
+    CreateSubscriptionDetail:
+      description: The detail of the requested event subscription.
+      type: object
+    EventTypeNotification:
+      type: string
+      description: Event triggered when an event-type event occurred.
+      enum:
+        - org.camaraproject.iot-network-optimization-notification.v1.power-saving
+        - org.camaraproject.iot-network-optimization-notification.v1.power-saving.error
+    SubscriptionEventType:
+      type: string
+      description: |
+        event-type that could be subscribed through this subscription. Several event-type could be defined.
+      enum:
+        - org.camaraproject.iot-network-optimization-notification.v1.power-saving
+        - org.camaraproject.iot-network-optimization-notification.v1.power-saving.error
     PowerSavingRequest:
       type: object
       required:
         - devices
         - enabled
-        - notificationSink
+        - subscriptionRequest
       properties:
         devices:
           type: array
@@ -352,8 +558,8 @@ components:
               format: date-time
               description: An instant of time, ending of the TimePeriod.
                 If not included, then the period has no ending date.
-        notificationSink:
-          $ref: '#/components/schemas/NotificationSink'
+        subscriptionRequest:
+          $ref: '#/components/schemas/SubscriptionRequest'
     DateTime:
       type: string
       format: date-time
@@ -395,10 +601,7 @@ components:
         source:
           $ref: '#/components/schemas/Source'
         type:
-          type: string
-          description: 'type of event as defined in each CAMARA API'
-          example: 'org.camaraproject.iot.dta-status-changed-event'
-          minLength: 25
+          $ref: "#/components/schemas/EventTypeNotification"
         specversion:
           type: string
           description: Version of the specification to which this event conforms
@@ -417,7 +620,11 @@ components:
             referenced by its type
         time:
           $ref: "#/components/schemas/DateTime"
-
+      discriminator:
+        propertyName: "type"
+        mapping:
+          org.camaraproject.iot-network-optimization-notification.v1.power-saving: "#/components/schemas/CloudEventPowerSaving"
+          org.camaraproject.iot-network-optimization-notification.v1.power-saving.error: "#/components/schemas/CloudEventError"
     CloudEventPowerSaving:
       description: provides back the power saving operation result.
       allOf:
@@ -425,6 +632,24 @@ components:
       properties:
         data:
           $ref: "#/components/schemas/PowerSavingResponse"
+
+    CloudEventError:
+      description: Error notification for a power saving report request.
+      allOf:
+        - $ref: "#/components/schemas/CloudEvent"
+      properties:
+        data:
+          allOf:
+            - $ref: "#/components/schemas/ErrorInfo"
+            - type: object
+              properties:
+                transactionId:
+                  type: string
+                  format: uuid
+                  description: Transaction identifier allocated for enabling/disabling IoT
+                    features
+              required:
+                - transactionId
 
     PowerSavingResponse:
       type: object
@@ -443,7 +668,7 @@ components:
           $ref: '#/components/schemas/Device'
         status:
           type: string
-          enum: [in-progress, success, failed]
+          enum: [pending, in-progress, success, failed]
 
     Device:
       description: |
@@ -535,13 +760,6 @@ components:
       type: integer
       minimum: 0
       maximum: 65535
-    Protocol:
-      description: The protocol for the influeced flow. It can be specified and
-       it is identified by a string according to the column “Keyword” as defined
-       by IANA (https://www.iana.org/assignments/protocol-numbers/\
-       protocol-numbers.xhtml), e.g. UDP or TCP.
-      type: string
-      example: "TCP"
     DeviceIpv6Address:
       description: |
        The device should be identified by the observed IPv6 address, or by any
@@ -703,6 +921,31 @@ components:
                 status: 404
                 code: UNKNOWN_APPLICATION_IDENTIFIER
                 message: the target application is unknown.
+    Generic410:
+      description: Gone
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 410
+                  code:
+                    enum:
+                      - GONE
+          examples:
+            GENERIC_410_GONE:
+              description: Use in notifications flow to allow API Consumer to indicate that its callback is no longer available
+              value:
+                status: 410
+                code: GONE
+                message: Access to the target resource is no longer available.
     Generic422:
       description: Unprocessable Content
       headers:
