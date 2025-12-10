@@ -345,7 +345,7 @@ components:
             Note: the maximum number of event types per subscription will be decided at API project level
           type: array
           minItems: 1
-          maxItems: 1
+          maxItems: 2
           items:
             $ref: "#/components/schemas/SubscriptionEventType"
         config:
