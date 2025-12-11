@@ -160,8 +160,8 @@ paths:
             schema:
               $ref: '#/components/schemas/PowerSavingRequest'
       responses:
-        "200":
-          description: Power-saving feature request sent successfully
+        "202":
+          description: Power-saving feature request accepted
           headers:
             x-correlator:
               $ref: '#/components/headers/x-correlator'
@@ -177,6 +177,8 @@ paths:
           $ref: "#/components/responses/Generic403"
         "404":
           $ref: "#/components/responses/Generic404"
+        "409":
+          $ref: "#/components/responses/Generic409"
         "501":
           $ref: "#/components/responses/Generic501"
       callbacks:
@@ -921,6 +923,31 @@ components:
                 status: 404
                 code: UNKNOWN_APPLICATION_IDENTIFIER
                 message: the target application is unknown.
+    Generic409:
+      description: Conflict
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 409
+                  code:
+                    enum:
+                      - CONFLICT
+          examples:
+            GENERIC_409_CONFLICT:
+              description: Device already in the requested state or conflicting operation in progress
+              value:
+                status: 409
+                code: CONFLICT
+                message: The device is already in the requested power-saving state or a conflicting operation is in progress.
     Generic410:
       description: Gone
       headers:
