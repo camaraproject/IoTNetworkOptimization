@@ -128,7 +128,7 @@ externalDocs:
 #                                     Servers                              #
 ############################################################################
 servers:
-  - url: "{apiRoot}/iot-network-opt/v0.1alpha1"
+  - url: "{apiRoot}/iot-network-optimization/v0.1alpha1"
     variables:
       apiRoot:
         default: http://localhost:9091
