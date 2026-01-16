@@ -24,7 +24,7 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     And "$.notificationSink" is set to a proper value
     When the HTTP "POST" request is sent
     Then the power saving settings will be activated for all the devices specified
-    And the response status code is 200
+    And the response status code is 202
     And the response header "Content-Type" is "application/json" and "x-correlator" has same value as the request header "x-correlator"
     # The response has to comply with the generic response schema which is part of the spec
     And the response body complies with the OAS schema at "/components/schemas/PowerSavingResponse"
@@ -45,7 +45,7 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     And "$.notificationSink" is set to a proper value
     When the HTTP "POST" request is sent
     Then the power saving settings will be activated for all the devices specified
-    And the response status code is 200
+    And the response status code is 202
     And the response header "Content-Type" is "application/json" and "x-correlator" has same value as the request header "x-correlator"
     # The response has to comply with the generic response schema which is part of the spec
     And the response body complies with the OAS schema at "/components/schemas/PowerSavingResponse" and "$.transactionId" is set to a proper value
@@ -66,7 +66,7 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     When the HTTP "POST" request is sent
     Then the power saving settings will be activated for all the devices specified
     And the activation will follow the parameters specified (e.g., only during the selected time period)
-    And the response status code is 200
+    And the response status code is 202
     And the response header "Content-Type" is "application/json" and "x-correlator" has same value as the request header "x-correlator"
     # The response has to comply with the generic response schema which is part of the spec
     And the response body complies with the OAS schema at "/components/schemas/PowerSavingResponse" with "$.transactionId" is set to a proper value
