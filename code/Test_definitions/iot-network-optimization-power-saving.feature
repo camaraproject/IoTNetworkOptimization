@@ -33,7 +33,7 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     And I receive a callback at "/components/schemas/NotificationSink/sink" with the body compliant to "/components/callbacks/onTransactionCompleted"
     And "x-correlator" as the same value as the request header "x-correlator"
     And the callback carries the information defined in "/components/schemas/CloudEventPowerSaving"
-    And "/components/schemas/CloudEventPowerSaving" in the callback should contain the parameter "$.transactionId" with the same value as in the 200 response of "/features/power-saving"
+    And "/components/schemas/CloudEventPowerSaving" in the callback should contain the parameter "$.transactionId" with the same value as in the 202 response of "/features/power-saving"
     And "/components/schemas/CloudEventPowerSaving" in the callback should contain the parameter "$.activationStatus" set to the expected value
     And each ("$.activationStatus[*].device") that used multiple identifiers in the request body, must return only the identifier used by the network
 
@@ -53,7 +53,7 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     And I should receive a callback at "/components/schemas/NotificationSink/sink" with the body compliant with "/components/callbacks/onTransactionCompleted"
     And "x-correlator" as the same value as the request header "x-correlator"
     And the callback carries the information defined in "/components/schemas/CloudEventPowerSaving"
-    And "/components/schemas/CloudEventPowerSaving" in the callback should contain the parameter "$.transactionId" with the same value as in the 200 response of "/features/power-saving"
+    And "/components/schemas/CloudEventPowerSaving" in the callback should contain the parameter "$.transactionId" with the same value as in the 202 response of "/features/power-saving"
     And "/components/schemas/CloudEventPowerSaving" in the callback should contain the parameter"$.activationStatus"
     And the parameter"$.activationStatus" should be set to the expected value as a list of status, one for each device
     And each ("$.activationStatus[*].device") that used multiple identifiers in the request body, must return only the identifier used by the network
@@ -74,7 +74,7 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
     And I should receive a callback at "/components/schemas/NotificationSink/sink" with the body compliant with "/components/callbacks/onTransactionCompleted"
     And "x-correlator" as the same value as the request header "x-correlator"
     And the callback carries the information defined in "/components/schemas/CloudEventPowerSaving"
-    And "/components/schemas/CloudEventPowerSaving" in the callback should contain the parameter "$.transactionId" with the same value as in the 200 response of "/features/power-saving"
+    And "/components/schemas/CloudEventPowerSaving" in the callback should contain the parameter "$.transactionId" with the same value as in the 202 response of "/features/power-saving"
     And "/components/schemas/CloudEventPowerSaving" in the callback should contain the parameter"$.activationStatus"
     And the parameter"$.activationStatus" should be set to the expected value as a list of status, one for each device
     And each ("$.activationStatus[*].device") that used multiple identifiers in the request body, must return only the identifier used by the network
