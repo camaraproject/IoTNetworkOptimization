@@ -7,7 +7,7 @@ Feature: CAMARA IoT Network Optimization API - vwip - Operation power-saving
 # * One or more IoT devices whose power saving features could be set.
 #
   Background: Common power-saving feature setup
-    Given the path "/features/power-saving"
+    Given the path "/iot-network-optimization/vwip/features/power-saving"
     And the header "Content-Type" is set to "application/json"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
